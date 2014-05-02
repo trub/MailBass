@@ -1,6 +1,59 @@
 extends layout
 
 block body
+  div(ng-controller='EmailController')
+    ul
+      li(ng-class='{active: activeTab == \'inbox\'}')
+        a(ng-click='activeTab=\'inbox\'') Inbox
+      li(ng-class='{active: activeTab == \'sent\'}')
+        a(ng-click='activeTab=\'sent\'') Sent
+    table(ng-show='activeTab==\'inbox\'')
+      tbody
+        tr(ng-repeat='email in emails', ng-click='showPopup(email)')
+          td {{ email.from }}
+          td {{ email.subject }}
+          td {{ email.date }}
+    table(ng-show='activeTab==\'sent\'')
+      tbody
+        tr(ng-repeat='email in sentEmails', ng-click='showPopup(email)')
+          td {{ email.to }}
+          td {{ email.subject }}
+          td {{ email.date | date:'MMM d' }}
+    button(ng-click='showComposePopup()') Compose
+    div(ng-show='isPopupVisible')
+      div
+        button(type='button', data-dismiss='modal', aria-hidden='true', ng-click='closePopup()') ×
+        h3 {{selectedEmail.subject}}
+      div
+        strong From:
+        | {{selectedEmail.from}}
+        br
+        strong To:
+        | {{selectedEmail.to}}
+        br
+        strong Date:
+        | {{selectedEmail.date | date:'MMM d' }}
+        br
+        br
+        span(style='white-space: pre;') {{selectedEmail.body}}
+      div
+        a(href='#', ng-click='forward()') Forward
+        a(href='#', ng-click='reply()') Reply
+        a(href='#', ng-click='closePopup()') Close
+    div(ng-show='isComposePopupVisible')
+      div
+       button(type='button', ng-click='closeComposePopup()') ×
+       h3 compose email
+      div
+       form
+        input(type='text', placeholder='To', style='width: 95%;', ng-model='composeEmail.to')
+        br
+        input(type='text', placeholder='To', style='width: 95%;', ng-model='composeEmail.subject')
+        br
+        textarea(style='width: 85%;', rows='10', ng-model='composeEmail.body')
+      div
+      a(href="#", ng-click='closeComposePopup') Close
+      a(href="#", ng-click='sendEmail()') Send
 
   script(src='js/lib/angular/angular.js')
   script(src='js/app.js')
@@ -9,4 +62,3 @@ block body
   script(src='js/filters.js')
   script(src='js/directives.js')
   script(src='js/index.js')
-
